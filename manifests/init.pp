@@ -40,26 +40,17 @@
 # @author - Peter Souter
 #
 class swap_file (
-  $files             = {},
-  $files_hiera_merge = false,
+  Optional[Hash] $files = {},
+  Optional[Variant[Enum['true', 'false', 'yes', 'no'], Boolean]] $files_hiera_merge = false,
 ) {
 
-  # variable handling
-  if $files_hiera_merge =~ Boolean {
-    $files_hiera_merge_bool = $files_hiera_merge
-  } else {
-    $files_hiera_merge_bool = str2bool($files_hiera_merge)
-  }
-  validate_legacy(Boolean, 'validate_bool', $files_hiera_merge_bool)
-
   # functionality
-  if $files_hiera_merge_bool == true {
+  if Boolean($files_hiera_merge) {
     $files_real = hiera_hash('swap_file::files', {})
   } else {
     $files_real = $files
   }
-  if $files_real != undef {
-    validate_legacy(Hash, 'validate_hash', $files_real)
+  if $files_real {
     create_resources('swap_file::files', $files_real)
   }
 }
